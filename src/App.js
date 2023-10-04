@@ -36,10 +36,15 @@ class  App extends React.Component {
         const {products} = this.state;
         const index = products.indexOf(product);
 
-        products[index].Qty +=1;
+        // products[index].Qty +=1;
 
-        this.setState({
-            products: products
+        // this.setState({
+        //     products: products
+        // })
+
+        const docRef = doc(this.db , products[index].id);
+        updateDoc(docRef , {
+          Qty: products[index].Qty +1 
         })
     }
 
@@ -51,19 +56,38 @@ class  App extends React.Component {
             return;
         }
 
-        products[index].Qty -=1;
+        // products[index].Qty -=1;
 
-        this.setState({
-            products: products
+        // this.setState({
+        //     products: products
+        // })
+
+        const docRef = doc(this.db , products[index].id);
+        updateDoc(docRef ,{
+          Qty:products[index].Qty -1 
         })
     }   
 
     handleDelete =(id) =>{
-        const {products} = this.state;
-        const items = products.filter((item) => item.id !== id);
-        this.setState({
-            products : items
-        })
+        // const {products} = this.state;
+        // const items = products.filter((item) => item.id !== id);
+        // this.setState({
+        //     products : items
+        // })
+        const docRef = doc(this.db , id);
+        deleteDoc(docRef);
+    }
+
+    addProduct = async ()=>{
+      const dataToAdd ={
+          img :"https://th.bing.com/th/id/OIP.5EZRHGR0LgL2IWcQ511TkQHaF5?pid=ImgDet&rs=1s",
+          price: 965 ,
+          Qty : 3,
+          title : 'Laptop firebase'
+       }
+
+       const docRef = await addDoc(this.db , dataToAdd);
+       console.log('product added ' , docRef);
     }
 
     getCount =()=>{
@@ -87,8 +111,13 @@ class  App extends React.Component {
     const {products , loading} = this.state;
       return (
         <div className="App">
-          <h1>Cart</h1>
+          {/* <h1>Cart</h1> */}
           <NavBar count={this.getCount()} />
+          <div className='bnav'>
+              <button onClick={this.addProduct}>Add a Product</button>
+              <div style={{color:'red'}}> TOTAL:{this.getTotalPrice()}</div>
+          </div>
+          
           <Cart 
           products = {products}
            onIncreaseQty ={this.handleIncreaseQty}
@@ -97,7 +126,7 @@ class  App extends React.Component {
           />
           {loading && <h1 style={{paddingLeft: 50}}>Loading Products ...</h1>}
 
-          <div style={{color:'red'}}> TOTAL:{this.getTotalPrice()}</div>
+          
         </div>
       );
    }

@@ -33,3 +33,13 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+.bnav{
+  display: inline-flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.bnav button {
+  display: block;
+}
