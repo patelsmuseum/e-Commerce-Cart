@@ -3,35 +3,32 @@ import CartItem from './CartItem';
 import NavBar from './NavBar';
 import Cart from './Cart';
 
+import { Firestore, firestore } from './index';
+import { collection, onSnapshot, addDoc, doc, updateDoc, deleteDoc} from 'firebase/firestore';
+
 class  App extends React.Component {
       constructor (){
         super();
         this.state ={
-            products:[
-                {
-                    price : 999,
-                    title : 'mobile',
-                    Qty : 3,
-                    img: 'https://media.istockphoto.com/id/1223365194/es/vector/manos-con-tel%C3%A9fonos-inteligentes.jpg?s=612x612&w=0&k=20&c=Xcn-5CVEQ4L1ef1OdsrAERKnxh4i5tY5f40ONBxRyyU=',
-                    id:1
-                },
-                {
-                    price : 987,
-                    title : 'Watch',
-                    Qty : 3,
-                    img: 'https://media.istockphoto.com/id/577316956/es/vector/vector-de-mano-del-reloj-de-pulsera.jpg?s=612x612&w=0&k=20&c=RjJ-_xJdWJMg_R8V83sRcqvf-mNe4iZgnU-GPxKhlOc=',
-                    id:2
-                },
-                {
-                    price : 4444,
-                    title : 'Laptop',
-                    Qty : 5,
-                    img: 'https://media.istockphoto.com/id/1266388738/es/foto/pantalla-en-blanco-ordenador-sobre-la-mesa-con-la-oficina-en-segundo-plano.jpg?s=612x612&w=0&k=20&c=7hcD6axxAXR8rEZhFkh8zPvSmP8Vnrpk2hbCeMMZfC0=',
-                    id: 3
-                }
-
-            ]
+            products:[] ,
+            loading : true
         }
+        this.db = collection(firestore , 'products');
+    }
+
+    componentDidMount(){
+      onSnapshot(this.db, (snapshot) =>{
+        const products = snapshot.docs.map((doc) => {
+          let data = doc.data();
+          data['id'] = doc.id;
+          return data
+        });
+    
+        this.setState({
+          products,
+          loading: false
+        })
+      });
     }
 
     handleIncreaseQty = (product) =>{
@@ -87,7 +84,7 @@ class  App extends React.Component {
       return price;
     }
    render(){
-    const {products} = this.state;
+    const {products , loading} = this.state;
       return (
         <div className="App">
           <h1>Cart</h1>
@@ -98,6 +95,8 @@ class  App extends React.Component {
            onDecreaseQty = {this.handleDecreaseQty}
            onDelete = {this.handleDelete}
           />
+          {loading && <h1 style={{paddingLeft: 50}}>Loading Products ...</h1>}
+
           <div style={{color:'red'}}> TOTAL:{this.getTotalPrice()}</div>
         </div>
       );
